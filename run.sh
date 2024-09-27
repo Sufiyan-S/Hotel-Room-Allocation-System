@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+# This file will be included as a Docker ENTRYPOINT in our automated testing evironment. 
 
-echo "Run you server here"
+echo "Build and Run you server here"
 exit 1
