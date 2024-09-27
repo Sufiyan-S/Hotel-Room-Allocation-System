@@ -21,7 +21,7 @@ Use the following raw JSON file/structure as mock data for potential guests in y
 * Documentation: Provide a README markdown explaining how to build, test, run the project and how to use it.
 * Testing: At minimum implement tests as specified in the provided test cases.
 * Web Framework: Use Spring Boot to expose the API.
-    * Make sure the `run.sh` script in yours repository root directory starts the application. Your script will be executed inside a Docker container (`eclipse-temurin:21-jdk-jammy` - Ubuntu v22.04).
+    * Make sure the `run.sh` script in yours repository root directory __builds__ and __starts__ the application. Your script will be executed inside the Docker container (`eclipse-temurin:21-jdk-jammy` - Ubuntu v22.04). We will run automated tests against the running service.
     * Make sure the application starts on port `8080`.
     * Make sure to implement the REST API as a POST request to `/occupancy` with:
         * Input:
