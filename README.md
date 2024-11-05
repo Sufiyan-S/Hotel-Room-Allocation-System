@@ -16,6 +16,10 @@ Use the following raw JSON file/structure as mock data for potential guests in y
 
 ## Requirements for a valid solution
 
+* Prioritize Code Quality, Readability and Clarity
+    * Maintain a clean code structure and formatting
+    * Use thoughtful naming for variables and functions
+    * Focus on good engineering practices and good application architecture
 * Java Version: Use the most modern version of Java you are comfortable with.
 * Version Control: Track your progress through Git commits.
 * Documentation: Provide a README markdown explaining how to build, test, run the project and how to use it.
@@ -45,9 +49,6 @@ Use the following raw JSON file/structure as mock data for potential guests in y
         }
         ```
 
-* Code Quality: Maintain a clean code structure and formatting.
-    * Use thoughtful naming for variables and functions.
-    * Prioritize Quality: Focus on high code quality over completeness if you feel time pressure.
 * Provide the URL of your __private__ GitHub repository. __Do not publish__ our Github fine-grained token in the repository. Consider using:
     * [Introducing fine-grained personal access tokens for GitHub](https://github.blog/2022-10-18-introducing-fine-grained-personal-access-tokens-for-github/)
     * [GitLab - Personal access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)
