@@ -1,12 +1,26 @@
-# Hotel Room Allocation
+# Hotel Room Allocation System
 
-## Requirements
+## Problem Statement
 
-Build a room occupancy optimization tool for one of our hotel clients! Our customer has a certain number of free rooms each night, as well as potential guests that would like to book a room for that night.
+Build a room allocation optimization tool for a hotel! The hotel has limited rooms available each night and multiple guests who want to book rooms at different price points.
 
-Our hotel clients have two different categories of rooms: Premium and Economy. Our hotels want their customers to be satisfied: they will not book a customer willing to pay EUR 100 or more for the night into an Economy room. But they will book lower paying customers into Premium rooms if these rooms are empty and all Economy rooms are occupied with low paying customers. The highest paying customers below EUR 100 will get preference for the “upgrade”. Customers always only have one specific price they are willing to pay for the night and if there are more guests than available rooms, the highest paying ones will be booked.
+## Business Rules
 
-Please build a small API that provides an interface for hotels to enter the numbers of Premium and Economy rooms that are available for the night and then tells them immediately how many rooms of each category will be occupied and how much money they will make in total. Potential guests are represented by an array of numbers that is their willingness to pay for the night.
+The hotel has two types of rooms:
+1. **Premium Rooms** - For high-paying guests (EUR 100+)
+2. **Economy Rooms** - For budget guests (below EUR 100)
+
+### Room Allocation Logic:
+
+1. **Premium guests (≥ EUR 100)** will ONLY be allocated Premium rooms
+2. **Economy guests (< EUR 100)** will be allocated Economy rooms by default
+3. **Smart Upgrade**: If Premium rooms are empty AND Economy rooms are full, lower-paying guests can be upgraded to Premium rooms
+   - The highest-paying Economy guests get upgraded first
+4. **Overbooking scenario**: When there are more guests than rooms, only the highest-paying guests get rooms
+
+Please build a small API that provides an interface for hotels to enter the numbers of Premium and Economy rooms that are available for the night. 
+API should tell them immediately how many rooms of each category will be occupied and how much money they will make in total. 
+Potential guests are represented by an array of numbers that is their willingness to pay for the night.
 
 Use the following raw JSON file/structure as mock data for potential guests in your tests:
 
@@ -22,10 +36,12 @@ Use the following raw JSON file/structure as mock data for potential guests in y
     * Focus on good engineering practices and good application architecture
 * Java Version: Use the most modern version of Java you are comfortable with.
 * Version Control: Track your progress through Git commits.
-* Documentation: Provide a README markdown explaining how to build, test, run the project and how to use it.
 * Testing: At minimum implement tests as specified in the provided test cases.
 * Web Framework: Use Spring Boot to expose the API.
-    * Make sure the `run.sh` script in yours repository root directory __builds__ and __starts__ the application. Your script will be executed inside the Docker container (`eclipse-temurin:21-jdk-jammy` - Ubuntu v22.04). We will run automated tests against the running service.
+    * Make sure the `run.sh` script in yours repository root directory __builds__ and __starts__ the application. 
+      * Your script will be executed inside the Docker container (`eclipse-temurin:21-jdk-jammy` - Ubuntu v22.04). 
+      * We will run automated tests against the running service. 
+      * Do *not* use `docker` or `docker-compose` inside the `run.sh` script. 
     * Make sure the application starts on port `8080`.
     * Make sure to implement the REST API as a POST request to `/occupancy` with:
         * Input:
