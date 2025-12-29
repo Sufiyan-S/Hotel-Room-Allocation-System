@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: hotel-room-booking-system
+  jackson:
+    deserialization:
+      use-big-decimal-for-floats: true
+    generator:
+      write-big-decimal-as-plain: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info, metric, prometheus
+  endpoint:
+    health:
+      probes:
+        enable: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:}, corr=%X{correlationId:-}]"
+
+idempotency:
+  cache:
+    maxSize: 10000
+    expireAfterWriteMinutes: 10
+
+api:
+  limits:
+    maxRequestBytes: 200000
+    defaultExplainLimit: 1000
+    maxExplainLimit: 5000
