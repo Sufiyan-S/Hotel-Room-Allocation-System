@@ -1,16 +1,19 @@
 #!/usr/bin/env sh
-set -eu
+set -e
 
 # ---------------------------------------
 # Configuration
 # ---------------------------------------
 MAVEN_VERSION="3.9.6"
-MAVEN_DIR=".maven/apache-maven-${MAVEN_VERSION}"
-MAVEN_BIN="${MAVEN_DIR}/bin/mvn"
 APP_NAME="hotel-room-booking-system"
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+MAVEN_BASE="${SCRIPT_DIR}/.maven"
+MAVEN_DIR="${MAVEN_BASE}/apache-maven-${MAVEN_VERSION}"
+MAVEN_BIN="${MAVEN_DIR}/bin/mvn"
+
 # ---------------------------------------
-# Verify Java (Java 21 required by pom.xml)
+# Verify Java (Java 21 required)
 # ---------------------------------------
 if ! command -v java >/dev/null 2>&1; then
   echo "ERROR: Java is not installed or not on PATH"
@@ -21,43 +24,58 @@ echo "Java version:"
 java -version
 
 # ---------------------------------------
-# Locate or Download Maven
+# Clean old/broken Maven
 # ---------------------------------------
-if command -v mvn >/dev/null 2>&1; then
-  MVN="mvn"
-else
-  if [ ! -x "$MAVEN_BIN" ]; then
-    echo "Maven not found. Downloading Apache Maven ${MAVEN_VERSION}..."
-    mkdir -p .maven
-
-    download() {
-      url="$1"
-      echo "Trying: $url"
-      curl -fsSL "$url" | tar -xz -C .maven
-    }
-
-    download "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz" \
-      || download "https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-  fi
-
-  MVN="$MAVEN_BIN"
+if [ -d "$MAVEN_DIR" ]; then
+  echo "Removing existing Maven installation (possible corruption)..."
+  rm -rf "$MAVEN_DIR"
 fi
+
+mkdir -p "$MAVEN_BASE"
+
+# ---------------------------------------
+# Download Maven (safe for Windows Git Bash)
+# ---------------------------------------
+echo "Downloading Apache Maven ${MAVEN_VERSION}..."
+
+MAVEN_TGZ="${MAVEN_BASE}/maven.tar.gz"
+
+curl -fsSL \
+  "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz" \
+  -o "$MAVEN_TGZ"
+
+tar -xzf "$MAVEN_TGZ" -C "$MAVEN_BASE"
+rm -f "$MAVEN_TGZ"
+
+# ---------------------------------------
+# Hard isolate Maven runtime
+# ---------------------------------------
+export MAVEN_HOME="$MAVEN_DIR"
+export PATH="$JAVA_HOME/bin:$MAVEN_HOME/bin:/usr/bin:/bin"
+unset MAVEN_OPTS
+unset JAVA_TOOL_OPTIONS
+unset CLASSPATH
+
+echo "Using Maven: $MAVEN_BIN"
+echo "Using Java: $JAVA_HOME"
+"$MAVEN_BIN" -v
 
 # ---------------------------------------
 # Build Application
 # ---------------------------------------
-echo "Building ${APP_NAME} with Maven..."
-"$MVN" -q -DskipTests clean package
+echo "Building ${APP_NAME}..."
+"$MAVEN_BIN" -q -DskipTests clean package
 
 # ---------------------------------------
-# Resolve JAR (Spring Boot repackage)
+# Resolve JAR
 # ---------------------------------------
 JAR_FILE="target/${APP_NAME}-0.0.1-SNAPSHOT.jar"
 
+echo "Looking for JAR: $JAR_FILE"
+
 if [ ! -f "$JAR_FILE" ]; then
-  echo "ERROR: JAR not found at ${JAR_FILE}"
-  echo "Contents of target/:"
-  ls -l target
+  echo "ERROR: JAR not found: $JAR_FILE"
+  ls -l target || true
   exit 1
 fi
 
@@ -65,4 +83,4 @@ fi
 # Run Application
 # ---------------------------------------
 echo "Starting application on port 8080..."
-exec java ${JAVA_OPTS:-""} -jar "$JAR_FILE"
+"$JAVA_HOME/bin/java" ${JAVA_OPTS:-} -jar "$JAR_FILE"
