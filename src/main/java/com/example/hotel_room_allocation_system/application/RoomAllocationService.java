@@ -7,6 +7,8 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,6 +21,7 @@ import java.util.PriorityQueue;
 @Service
 public class RoomAllocationService {
     private static final BigDecimal PREMIUM_THRESHOLD = BigDecimal.valueOf(100);
+    private static final Logger log = LoggerFactory.getLogger(RoomAllocationService.class);
 
     private final Counter requests;
     private final DistributionSummary potentialGuestCount;
@@ -123,8 +126,8 @@ public class RoomAllocationService {
                 ? clampTopK((long) economyRooms + (long) premiumRooms + (long) explainLimit, potentialGuests.size())
                 : clampTopK((long) economyRooms + (long) premiumRooms, potentialGuests.size());
 
-        PriorityQueue<BigDecimal> premiumHeap = new PriorityQueue<>(premiumRooms);
-        PriorityQueue<BigDecimal> economyHeap = new PriorityQueue<>(economyRooms);
+        PriorityQueue<BigDecimal> premiumHeap = premiumTopK > 0 ? new PriorityQueue<>(premiumTopK) : null;
+        PriorityQueue<BigDecimal> economyHeap = economyTopK > 0 ? new PriorityQueue<>(economyTopK) : null;
 
         int premiumCount = 0;
         int economyCount = 0;
@@ -225,7 +228,7 @@ public class RoomAllocationService {
 
 
     private static void offerTopK(PriorityQueue<BigDecimal> minHeap, BigDecimal value, int k){
-        if(k <= 0) {
+        if (minHeap == null || k <= 0) {
             return;
         }
 
