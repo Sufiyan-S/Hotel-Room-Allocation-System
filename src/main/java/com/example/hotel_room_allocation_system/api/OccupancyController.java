@@ -78,10 +78,13 @@ public class OccupancyController {
     }
 
     private Object computeResponse(OccupancyRequest request, boolean explain, int explainLimit){
+        int premiumRoom = request.premiumRooms() == null ? 0 : request.premiumRooms();
+        int economyRoom = request.economyRooms() == null ? 0 : request.economyRooms();
+
         if(!explain){
             AllocationResult result = roomAllocationService.allocate(
-                    request.premiumRooms(),
-                    request.economyRooms(),
+                    premiumRoom,
+                    economyRoom,
                     request.potentialGuests()
             );
             return new OccupancyResponse(
@@ -93,8 +96,8 @@ public class OccupancyController {
         }
 
         AllocationExplainResult result = roomAllocationService.allocateExplain(
-                request.premiumRooms(),
-                request.economyRooms(),
+                premiumRoom,
+                economyRoom,
                 request.potentialGuests(),
                 explainLimit
         );
